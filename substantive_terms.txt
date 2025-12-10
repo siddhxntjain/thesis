@@ -1,0 +1,75 @@
+renewable
+solar
+photovoltaic
+PV
+wind
+offshore wind
+onshore wind
+wind turbine
+wind farm
+green hydrogen
+blue hydrogen
+electrolyzer
+electrolysis
+direct air capture
+DAC
+carbon capture
+CCS
+CCUS
+battery
+lithium-ion
+energy storage
+BESS
+EV charging
+electric vehicle
+heat pump
+SMR
+small modular reactor
+interconnection
+grid modernization
+transmission upgrade
+power purchase agreement
+PPA
+offtake agreement
+MW
+GW
+GWh
+MWh
+TWh
+LCOE
+levelized cost
+IRA
+45Q
+48C
+45V
+45X
+Inflation Reduction Act
+electrification
+decarbonization
+decarbonisation
+net zero
+net-zero
+carbon negative
+inverter
+microgrid
+demand response
+virtual power plant
+VPP
+renewable energy certificate
+REC
+zero emission
+zero-emission
+interconnection queue
+battery pack
+lithium iron phosphate
+LFP
+nickel manganese cobalt
+NMC
+energy density
+utility-scale storage
+utility scale storage
+stationary storage
+ESS
+energy storage system
+sustainable aviation fuel
+SAF

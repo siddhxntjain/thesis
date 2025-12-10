@@ -1,18 +1,10 @@
 #!/usr/bin/env python3
 """
 EDGAR 10-K NLP scorer
-- Downloads recent 10-Ks for given tickers (official EDGAR JSON endpoints)
-- Scores each filing for "substantive" energy-transition language vs "boilerplate" ESG language
-- Normalizes counts per 10k words
-- Computes z-scores on a chosen metric:
-    --score-metric tls          -> tls_raw = (substantive - boilerplate) per 10k words
-    --score-metric substantive  -> substantive_per10k only
-- Saves a CSV with all components plus the chosen score and z-score
-
-Notes:
-- This script analyzes HTML text without scraping tricks; uses SEC endpoints with a compliant User-Agent.
-- If you want to add/remove terms, edit the SUBSTANTIVE_TERMS / BOILERPLATE_TERMS blocks
-  (or pass external text files via --substantive-file / --boilerplate-file).
+- Downloads recent 10-Ks for given tickers from SEC EDGAR
+- Scores filings for substantive energy-transition language vs boilerplate ESG language
+- Computes 18 weighting variations (6 methodologies × 3 metrics) + z-scores
+- Normalizes all counts per 10k words for comparability
 """
 
 import argparse, json, os, re, time, unicodedata
@@ -22,77 +14,13 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import numpy as np
+from tqdm import tqdm
 
 # ----------------------------- CONFIG ---------------------------------
 
 # IMPORTANT: Use a clear, identifying User-Agent per SEC guidance.
 UA = "Mozilla/5.0 (Sid Jain; sidjain@princeton.edu)"
 BASE = "https://www.sec.gov"
-
-# Local cache for the SEC ticker map JSON (avoids re-downloading every run)
-DATA_DIR = Path("edgar_cache")
-DATA_DIR.mkdir(exist_ok=True)
-
-# === LEXICONS (easy to edit) ==========================================
-# You can edit these multi-line strings directly (one term per line), or
-# provide external files with --substantive-file / --boilerplate-file.
-
-SUBSTANTIVE_TERMS = """
-renewable
-solar
-wind
-offshore wind
-wind turbine
-wind farm
-hydrogen
-electrolyzer
-direct air capture
-DAC
-carbon capture
-CCS
-battery
-energy storage
-EV charging
-EV-charging
-heat pump
-interconnection
-grid modernization
-transmission
-power purchase agreement
-PPA
-offtake
-capacity
-MW
-GW
-GWh
-LCOE
-IRA
-45Q
-48C
-45V
-45X
-tax credit
-capex
-capital expenditure
-retrofit
-scope 1
-scope 2
-scope 3
-""".strip().splitlines()
-
-BOILERPLATE_TERMS = """
-ESG
-CSR
-sustainability values
-materiality assessment
-GRI
-SASB
-TCFD
-purpose
-responsible business
-diversity and inclusion
-D&I
-""".strip().splitlines()
 
 # === SECTION HEADERS (for weighting) ==================================
 # We lightly upweight matches found in these canonical 10-K sections,
@@ -137,15 +65,8 @@ def http_get(url, params=None, binary=False, sleep=0.8):
     raise RuntimeError(f"GET failed: {url} (status {r.status_code})")
 
 def load_ticker_map() -> pd.DataFrame:
-    """
-    Load the SEC 'company_tickers.json' list mapping tickers to CIKs.
-    Caches to DATA_DIR to avoid repeated downloads.
-    """
-    path = DATA_DIR / "company_tickers.json"
-    if not path.exists():
-        txt = http_get(f"{BASE}/files/company_tickers.json")
-        path.write_text(txt, encoding="utf-8")
-    data = json.loads(path.read_text(encoding="utf-8"))
+    """Load the SEC 'company_tickers.json' list mapping tickers to CIKs."""
+    data = json.loads(Path("edgar_cache/company_tickers.json").read_text(encoding="utf-8"))
     recs = []
     for obj in data.values():
         recs.append({"ticker": obj["ticker"].upper(), "cik": int(obj["cik_str"]), "title": obj["title"]})
@@ -205,15 +126,34 @@ def html_to_text(html: str) -> str:
 
 def section_weights(text: str) -> List[Tuple[Tuple[int,int], float]]:
     """
-    Locate key section headers and assign a weighting window after each header.
-    We apply a 1.5x weight to matches within ~20k characters after each header.
+    Locate key section headers and assign a weighting window for each ENTIRE section.
+    Each section runs from its header until the next 'Item' header (or end of document).
+    We apply a 1.5x weight to matches within these sections.
     """
+    # Find all Item headers (not just the key ones we weight)
+    all_item_pattern = re.compile(r"\bItem\s+\d+[A-Z]?\.", re.I)
+    all_items = [(m.start(), m.group()) for m in all_item_pattern.finditer(text)]
+
+    # Sort by position
+    all_items.sort(key=lambda x: x[0])
+
     weights = []
     for pat in SECTION_HEADS:
         for m in re.finditer(pat, text, re.I):
-            start = max(0, m.start())
-            end = min(len(text), m.start() + 20000)  # 20k chars window
+            start = m.start()
+
+            # Find the next Item header after this one
+            next_item_pos = None
+            for item_pos, item_text in all_items:
+                if item_pos > start:
+                    next_item_pos = item_pos
+                    break
+
+            # End is either next Item or end of document
+            end = next_item_pos if next_item_pos is not None else len(text)
+
             weights.append(((start, end), 1.5))
+
     return weights
 
 def build_regex_list(terms: List[str]) -> List[re.Pattern]:
@@ -239,11 +179,11 @@ def build_regex_list(terms: List[str]) -> List[re.Pattern]:
 def count_matches(text: str,
                   patterns: List[re.Pattern],
                   section_spans: List[Tuple[Tuple[int,int], float]],
-                  proximity: bool=False) -> float:
+                  proximity_multiplier: float=1.0) -> float:
     """
     Count weighted matches for a list of compiled regex 'patterns' in 'text'.
     - 'section_spans' is a list of ((start_idx, end_idx), weight) to upweight matches in key sections.
-    - If 'proximity' is True, boost matches with nearby numeric context (capacity/$).
+    - 'proximity_multiplier': weight multiplier when match is near numeric context (1.0 = no boost)
     Returns a float total (weights summed).
     """
     total = 0.0
@@ -258,12 +198,12 @@ def count_matches(text: str,
                     w *= ww
                     break
 
-            # 2) Numeric proximity: if enabled, search ±120 chars for a number+unit/money phrase
-            if proximity:
+            # 2) Numeric proximity: if multiplier > 1.0, search ±120 chars for a number+unit/money phrase
+            if proximity_multiplier > 1.0:
                 lo = max(0, idx - 120)  # ~±8–10 words in char space
                 hi = min(len(text), idx + 120)
                 if NUMERIC_CONTEXT.search(text[lo:hi]):
-                    w *= 1.4
+                    w *= proximity_multiplier
 
             total += w
     return total
@@ -272,42 +212,70 @@ def analyze_filing(html: str,
                    substantive_pats: List[re.Pattern],
                    boilerplate_pats: List[re.Pattern]) -> Dict[str, float]:
     """
-    Convert HTML -> plain text, compute normalized counts per 10k words for:
-      - substantive_per10k
-      - boilerplate_per10k
-      - tls_raw = (substantive - boilerplate) per 10k
+    Convert HTML -> plain text, compute normalized counts per 10k words with multiple weighting variations.
+
+    Variations tested:
+      - Base (no weights)
+      - Section-weighted only
+      - Proximity-weighted with multipliers: 1.5x, 2x
+      - Section + Proximity combinations
+
+    This allows testing different NLP methodologies without re-downloading filings.
     """
     text = html_to_text(html)
     length_tokens = max(1, len(text.split()))
-    spans = section_weights(text)
-
-    sub = count_matches(text, substantive_pats, spans, proximity=True)
-    pr  = count_matches(text, boilerplate_pats, spans, proximity=False)
-
-    # Normalize per 10k words so filings of different lengths are comparable
     scale = 10000.0 / length_tokens
-    return {
-        "tokens": length_tokens,
-        "substantive_per10k": sub * scale,
-        "boilerplate_per10k": pr * scale,
-        "tls_raw": (sub - pr) * scale
-    }
+
+    # Get section spans for weighting (empty list = no section weighting)
+    spans = section_weights(text)
+    no_spans = []  # For unweighted baseline
+
+    # Proximity multipliers to test
+    PROX_MULTS = [1.0, 1.5, 2.0]  # 1.0 = no boost, 1.5 = moderate, 2.0 = strong
+
+    results = {"tokens": length_tokens}
+
+    # 1. Base (no weights at all)
+    sub_base = count_matches(text, substantive_pats, no_spans, proximity_multiplier=1.0)
+    bp_base = count_matches(text, boilerplate_pats, no_spans, proximity_multiplier=1.0)
+    results["substantive_base"] = sub_base * scale
+    results["boilerplate_base"] = bp_base * scale
+    results["tls_base"] = (sub_base - bp_base) * scale
+
+    # 2. Section-weighted only (no proximity)
+    sub_section = count_matches(text, substantive_pats, spans, proximity_multiplier=1.0)
+    bp_section = count_matches(text, boilerplate_pats, spans, proximity_multiplier=1.0)
+    results["substantive_section"] = sub_section * scale
+    results["boilerplate_section"] = bp_section * scale
+    results["tls_section"] = (sub_section - bp_section) * scale
+
+    # 3. Proximity variations (no section weighting)
+    for pm in [1.5, 2.0]:
+        suffix = f"prox{int(pm*10)}"  # prox15, prox20
+        sub_p = count_matches(text, substantive_pats, no_spans, proximity_multiplier=pm)
+        bp_p = count_matches(text, boilerplate_pats, no_spans, proximity_multiplier=1.0)
+        results[f"substantive_{suffix}"] = sub_p * scale
+        results[f"boilerplate_{suffix}"] = bp_p * scale
+        results[f"tls_{suffix}"] = (sub_p - bp_p) * scale
+
+    # 4. Section + Proximity combinations
+    for pm in [1.5, 2.0]:
+        suffix = f"full{int(pm*10)}"  # full15, full20
+        sub_sp = count_matches(text, substantive_pats, spans, proximity_multiplier=pm)
+        bp_sp = count_matches(text, boilerplate_pats, spans, proximity_multiplier=1.0)
+        results[f"substantive_{suffix}"] = sub_sp * scale
+        results[f"boilerplate_{suffix}"] = bp_sp * scale
+        results[f"tls_{suffix}"] = (sub_sp - bp_sp) * scale
+
+    return results
 
 def load_terms_from_file(path: str) -> List[str]:
-    """
-    Optional helper: load a term list from a text file (one term per line).
-    Blank lines are ignored.
-    """
-    lines = []
-    with open(path, "r", encoding="utf-8") as f:
-        for line in f:
-            t = line.strip()
-            if t:
-                lines.append(t)
-    return lines
+    """Load term list from a text file (one term per line)."""
+    return [line.strip() for line in Path(path).read_text(encoding="utf-8").splitlines() if line.strip()]
 
 def run(tickers: List[str], max_filings: int,
         score_metric: str,
+        output_file: str,
         substantive_file: str=None,
         boilerplate_file: str=None) -> pd.DataFrame:
     """
@@ -316,37 +284,50 @@ def run(tickers: List[str], max_filings: int,
     - Pull recent filings index
     - Download 10-K primary docs
     - Analyze, normalize, and compute chosen score and z-score
+    - Continuously saves results and skips already-processed tickers
     """
-    # 1) Build lexicons (either from defaults above, or override from files)
-    substantive_terms = SUBSTANTIVE_TERMS if not substantive_file else load_terms_from_file(substantive_file)
-    boilerplate_terms = BOILERPLATE_TERMS if not boilerplate_file else load_terms_from_file(boilerplate_file)
+    # 1) Load lexicons from external files
+    substantive_terms = load_terms_from_file(substantive_file)
+    boilerplate_terms = load_terms_from_file(boilerplate_file)
 
-    # Compile terms into regex patterns once (faster than compiling every match)
+    # Compile terms into regex patterns once
     substantive_pats = build_regex_list(substantive_terms)
     boilerplate_pats = build_regex_list(boilerplate_terms)
 
-    # 2) Map tickers -> CIKs
+    # 2) Load existing results to skip already-processed tickers
+    existing_tickers = set()
+    if Path(output_file).exists():
+        existing_df = pd.read_csv(output_file)
+        existing_tickers = set(existing_df["ticker"].unique())
+        tqdm.write(f"[INFO] Loaded {len(existing_tickers)} already-processed tickers, will skip them")
+
+    # 3) Map tickers -> CIKs
     tickmap = load_ticker_map()
     tickmap["ticker"] = tickmap["ticker"].str.upper()
     want = pd.DataFrame({"ticker": [t.strip().upper() for t in tickers]})
     dfm = want.merge(tickmap, on="ticker", how="left")
 
+    # Filter out already-processed tickers
+    dfm = dfm[~dfm["ticker"].isin(existing_tickers)]
+    tqdm.write(f"[INFO] {len(dfm)} tickers remaining to process")
+
     rows = []
-    for _, r in dfm.iterrows():
+    for _, r in tqdm(dfm.iterrows(), total=len(dfm), desc="Processing tickers", unit="ticker"):
         tkr, cik = r["ticker"], r["cik"]
         if pd.isna(cik):
-            print(f"[WARN] No CIK for {tkr} (skipping)")
+            tqdm.write(f"[WARN] No CIK for {tkr} (skipping)")
             continue
         try:
-            # 3) Pull the recent filings JSON and filter to 10-K rows
+            # 4) Pull the recent filings JSON and filter to 10-K rows
             filings = get_recent_filings(int(cik))
             krows = pick_10k_rows(filings, max_filings)
 
-            # 4) Download and analyze each 10-K primary document
+            # 5) Download and analyze each 10-K primary document
+            ticker_rows = []
             for _, fr in krows.iterrows():
                 html = download_primary_doc(int(cik), fr["accessionNumber"], fr["primaryDocument"])
                 metrics = analyze_filing(html, substantive_pats, boilerplate_pats)
-                rows.append({
+                ticker_rows.append({
                     "ticker": tkr,
                     "cik": int(cik),
                     "filing_date": fr["filingDate"],
@@ -354,28 +335,49 @@ def run(tickers: List[str], max_filings: int,
                     "doc": fr["primaryDocument"],
                     **metrics
                 })
-        except Exception as e:
-            print(f"[ERR] {tkr}: {e}")
 
-    out = pd.DataFrame(rows)
-    if not len(out):
+            rows.extend(ticker_rows)
+            tqdm.write(f"[DONE] {tkr}: {len(krows)} filings analyzed")
+
+            # 6) Append to CSV file immediately after each ticker
+            if ticker_rows:
+                temp_df = pd.DataFrame(ticker_rows)
+                # Write header only if file doesn't exist
+                write_header = not Path(output_file).exists()
+                temp_df.to_csv(output_file, mode='a', header=write_header, index=False)
+
+        except Exception as e:
+            tqdm.write(f"[ERR] {tkr}: {e}")
+
+    # 7) Load all results for final z-score computation
+    out = pd.read_csv(output_file) if Path(output_file).exists() else pd.DataFrame(rows)
+    if len(out) == 0:
         return out
 
-    # 5) Choose the scoring metric (toggle):
-    #    - tls:          use tls_raw (substantive - boilerplate)
-    #    - substantive:  use substantive_per10k only
-    if score_metric == "tls":
-        out["score_raw"] = out["tls_raw"]
-    elif score_metric == "substantive":
-        out["score_raw"] = out["substantive_per10k"]
-    else:
-        raise ValueError("score_metric must be 'tls' or 'substantive'")
+    # 8) Compute z-scores for ALL metrics
+    # This allows post-hoc analysis of which methodology works best
 
-    # 6) Compute z-scores on the chosen score (for comparability across firms)
-    out["score_z"] = zscore(out["score_raw"])
+    # Base metrics z-scores
+    out["substantive_base_z"] = zscore(out["substantive_base"])
+    out["boilerplate_base_z"] = zscore(out["boilerplate_base"])
+    out["tls_base_z"] = zscore(out["tls_base"])
 
-    # Keep legacy tls_z for backward compatibility (when using tls)
-    out["tls_z"] = zscore(out["tls_raw"])
+    # Section-weighted z-scores
+    out["substantive_section_z"] = zscore(out["substantive_section"])
+    out["boilerplate_section_z"] = zscore(out["boilerplate_section"])
+    out["tls_section_z"] = zscore(out["tls_section"])
+
+    # Proximity-weighted z-scores (1.5x and 2x)
+    for suffix in ["prox15", "prox20"]:
+        out[f"substantive_{suffix}_z"] = zscore(out[f"substantive_{suffix}"])
+        out[f"boilerplate_{suffix}_z"] = zscore(out[f"boilerplate_{suffix}"])
+        out[f"tls_{suffix}_z"] = zscore(out[f"tls_{suffix}"])
+
+    # Full weighting z-scores (section + proximity at 1.5x and 2x)
+    for suffix in ["full15", "full20"]:
+        out[f"substantive_{suffix}_z"] = zscore(out[f"substantive_{suffix}"])
+        out[f"boilerplate_{suffix}_z"] = zscore(out[f"boilerplate_{suffix}"])
+        out[f"tls_{suffix}_z"] = zscore(out[f"tls_{suffix}"])
 
     return out
 
@@ -383,39 +385,56 @@ def run(tickers: List[str], max_filings: int,
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="EDGAR 10-K transition-language scorer")
-    ap.add_argument("--tickers", type=str, required=True,
+    ap.add_argument("--tickers", type=str, default=None,
                     help="Comma-separated list, e.g., TSLA,NEE,GE")
+    ap.add_argument("--tickers-file", type=str, default=None,
+                    help="Path to a file containing tickers (space or comma-separated)")
     ap.add_argument("--max-filings", type=int, default=1,
                     help="How many 10-Ks per ticker (most recent first)")
     ap.add_argument("--out", type=str, default="tls_scores.csv",
                     help="Output CSV path")
     ap.add_argument("--score-metric", choices=["tls","substantive"], default="tls",
                     help="Scoring basis: 'tls' (substantive - boilerplate) or 'substantive' only")
-    ap.add_argument("--substantive-file", type=str, default=None,
-                    help="Optional path to a text file of substantive terms (one per line)")
-    ap.add_argument("--boilerplate-file", type=str, default=None,
-                    help="Optional path to a text file of boilerplate terms (one per line)")
+    ap.add_argument("--substantive-file", type=str, default="substantive_terms.txt",
+                    help="Path to a text file of substantive terms (one per line, default: substantive_terms.txt)")
+    ap.add_argument("--boilerplate-file", type=str, default="boilerplate_terms.txt",
+                    help="Path to a text file of boilerplate terms (one per line, default: boilerplate_terms.txt)")
     args = ap.parse_args()
 
-    # Split tickers and run
-    tickers = [t for t in args.tickers.split(",") if t.strip()]
+    # Get tickers from either --tickers or --tickers-file
+    if args.tickers_file:
+        content = Path(args.tickers_file).read_text().replace(',', ' ')
+        tickers = [t.strip() for t in content.split() if t.strip()]
+    elif args.tickers:
+        tickers = [t.strip() for t in args.tickers.split(",") if t.strip()]
+    else:
+        ap.error("Must provide either --tickers or --tickers-file")
     res = run(tickers,
               args.max_filings,
               score_metric=args.score_metric,
+              output_file=args.out,
               substantive_file=args.substantive_file,
               boilerplate_file=args.boilerplate_file)
 
-    # Save or report empty
-    if len(res):
-        # Always save all component columns plus chosen score + z
+    # Final save with recomputed z-scores
+    if len(res) > 0:
         cols = [
             "ticker","cik","filing_date","accession","doc","tokens",
-            "substantive_per10k","boilerplate_per10k","tls_raw","tls_z",
-            "score_raw","score_z"
+            "substantive_base","boilerplate_base","tls_base",
+            "substantive_base_z","boilerplate_base_z","tls_base_z",
+            "substantive_section","boilerplate_section","tls_section",
+            "substantive_section_z","boilerplate_section_z","tls_section_z",
+            "substantive_prox15","boilerplate_prox15","tls_prox15",
+            "substantive_prox15_z","boilerplate_prox15_z","tls_prox15_z",
+            "substantive_prox20","boilerplate_prox20","tls_prox20",
+            "substantive_prox20_z","boilerplate_prox20_z","tls_prox20_z",
+            "substantive_full15","boilerplate_full15","tls_full15",
+            "substantive_full15_z","boilerplate_full15_z","tls_full15_z",
+            "substantive_full20","boilerplate_full20","tls_full20",
+            "substantive_full20_z","boilerplate_full20_z","tls_full20_z",
         ]
-        # Ensure we only write available columns (robust to schema tweaks)
-        cols = [c for c in cols if c in res.columns]
         Path(args.out).write_text(res[cols].to_csv(index=False), encoding="utf-8")
-        print(f"Wrote {args.out} with {len(res)} rows. Scored on: {args.score_metric}")
+        print(f"\n[COMPLETE] {args.out}: {len(res)} rows, {len(cols)} columns")
+        print(f"6 methodologies × 3 metrics × 2 = 36 variations (raw + z-scores)")
     else:
-        print("No results. Check tickers or network.")
+        print("No results.")
