@@ -1,0 +1,395 @@
+================================================================================
+EDGAR TLS ANALYSIS - SUMMARY STATISTICS
+================================================================================
+
+Total filings analyzed: 6265
+Unique companies: 2194
+Unique sectors: 12
+Unique industries: 75
+
+--------------------------------------------------------------------------------
+TLS SCORE STATISTICS (BASE METHODOLOGY)
+--------------------------------------------------------------------------------
+Mean: 1.224
+Median: -0.614
+Std Dev: 11.004
+Min: -144.069
+Max: 285.888
+
+--------------------------------------------------------------------------------
+TOP 5 SECTORS BY AVERAGE TLS SCORE
+--------------------------------------------------------------------------------
+Utilities & Telecommunications:  16.302 (n=220)
+Energy                        :   6.510 (n=278)
+Industrials                   :   1.509 (n=688)
+Transports                    :   0.870 (n=105)
+Materials                     :   0.229 (n=276)
+
+--------------------------------------------------------------------------------
+TOP 10 INDUSTRIES BY AVERAGE TLS SCORE (min 5 companies)
+--------------------------------------------------------------------------------
+Utilities - Electric                    :  29.782 (n=73)
+Utilities - Multiline                   :  26.035 (n=48)
+Energy Equipment & Services             :   8.993 (n=88)
+Automobiles & Motorcycles               :   7.563 (n=36)
+Electrical Equipment                    :   7.437 (n=100)
+Integrated Oil & Gas                    :   6.705 (n=15)
+Oil & Gas Production                    :   5.982 (n=153)
+Semiconductors                          :   5.196 (n=139)
+Utilities - Gas                         :   4.900 (n=35)
+Aluminum                                :   4.383 (n=6)
+
+--------------------------------------------------------------------------------
+MARKET CAP BUCKET ANALYSIS
+--------------------------------------------------------------------------------
+Small     : Mean=  0.429, Median= -0.655 (n=1367)
+Medium    : Mean=  0.771, Median= -0.693 (n=1367)
+Large     : Mean=  0.716, Median= -0.624 (n=1366)
+Mega      : Mean=  2.119, Median= -0.513 (n=1368)
+
+--------------------------------------------------------------------------------
+METHODOLOGY CORRELATIONS (with base)
+--------------------------------------------------------------------------------
+tls_base vs tls_section : 0.9879
+tls_base vs tls_prox15  : 0.9951
+tls_base vs tls_prox20  : 0.9916
+tls_base vs tls_full15  : 0.9836
+tls_base vs tls_full20  : 0.9761
+
+================================================================================
+SECTOR: COMMUNICATIONS
+================================================================================
+
+--- Top 10 Firms (by most recent TLS Score) ---
+Atlanta Braves Holdings Inc             :    3.472 (Filing Date: 2025-03-03)
+Alphabet Inc. Class C                   :    0.898 (Filing Date: 2025-02-05)
+Alphabet Inc. Class A                   :    0.898 (Filing Date: 2025-02-05)
+Emerald Expositions Events Inc          :    0.809 (Filing Date: 2025-03-14)
+Liberty Broadband Corp Class A          :    0.644 (Filing Date: 2025-02-27)
+Salem Media Group Inc                   :    0.564 (Filing Date: 2023-03-13)
+Meta Platforms Inc. (Facebook Inc.)     :    0.380 (Filing Date: 2025-01-30)
+John Wiley & Sons Inc                   :    0.309 (Filing Date: 2025-06-25)
+Graham Holdings, Inc.                   :    0.229 (Filing Date: 2025-02-26)
+The Trade Desk Inc Class A              :    0.000 (Filing Date: 2025-02-21)
+
+--- Bottom 10 Firms (by most recent TLS Score) ---
+Morningstar Inc                         :   -5.051 (Filing Date: 2025-02-28)
+Liberty Glbl Holdings Ltd               :   -4.333 (Filing Date: 2025-03-25)
+Workday Inc                             :   -3.663 (Filing Date: 2025-03-11)
+Lamar Advertising Co                    :   -3.327 (Filing Date: 2025-02-20)
+Q2 Holdings Inc                         :   -3.175 (Filing Date: 2025-02-12)
+Shopify Inc                             :   -3.027 (Filing Date: 2025-04-29)
+CSG Systems International Inc.          :   -3.001 (Filing Date: 2025-02-20)
+IAC/Interactivecorp                     :   -2.997 (Filing Date: 2025-04-29)
+Sinclair Inc                            :   -2.650 (Filing Date: 2025-02-26)
+S&P Global Inc. (McGraw-Hill Inc.)      :   -2.629 (Filing Date: 2025-02-11)
+
+================================================================================
+SECTOR: CONSUMER DISCRETIONARY
+================================================================================
+
+--- Top 10 Firms (by most recent TLS Score) ---
+Tesla Inc                               :   29.794 (Filing Date: 2025-04-30)
+Century Communities Inc                 :   26.220 (Filing Date: 2025-01-30)
+Lucid Group Inc                         :   19.545 (Filing Date: 2025-02-25)
+EVgo Inc                                :   18.603 (Filing Date: 2025-03-06)
+REX American Resources Corp.            :   17.037 (Filing Date: 2025-03-28)
+Borg Warner Inc                         :   12.015 (Filing Date: 2025-02-06)
+Lear Corp                               :    9.074 (Filing Date: 2025-02-14)
+Rivian Automotive Inc                   :    8.849 (Filing Date: 2025-02-24)
+Gentherm Inc.                           :    7.925 (Filing Date: 2025-02-19)
+Ford Motor Co.                          :    7.838 (Filing Date: 2025-02-06)
+
+--- Bottom 10 Firms (by most recent TLS Score) ---
+Kohl's Corp.                            :   -7.444 (Filing Date: 2025-03-20)
+Deckers Outdoor Corp                    :   -6.933 (Filing Date: 2025-05-23)
+eBay Inc.                               :   -6.124 (Filing Date: 2025-05-30)
+Gap Inc                                 :   -5.488 (Filing Date: 2025-03-18)
+Biglari Holdings Inc Class A            :   -5.203 (Filing Date: 2025-03-31)
+Dick's Sporting Goods, Inc              :   -4.765 (Filing Date: 2025-03-27)
+RealReal Inc                            :   -4.253 (Filing Date: 2025-02-21)
+Caesars Entertainment Inc               :   -4.156 (Filing Date: 2025-02-25)
+Shake Shack Inc                         :   -4.026 (Filing Date: 2025-02-21)
+Sprouts Farmers Market Inc              :   -3.858 (Filing Date: 2025-02-20)
+
+================================================================================
+SECTOR: CONSUMER STAPLES
+================================================================================
+
+--- Top 10 Firms (by most recent TLS Score) ---
+Seaboard Corp. (Hathaway Bakeries)      :   12.262 (Filing Date: 2025-02-13)
+Darling Ingredients Inc                 :   10.112 (Filing Date: 2025-02-25)
+Energizer Holdings Inc                  :    9.798 (Filing Date: 2025-11-18)
+Casey's General Stores, Inc.            :    2.545 (Filing Date: 2025-06-23)
+Molson Coors Brewing Co                 :    1.204 (Filing Date: 2025-02-18)
+Andersons, Inc. (The)                   :    1.124 (Filing Date: 2025-02-19)
+Colgate-Palmolive Co.                   :    1.101 (Filing Date: 2025-02-13)
+Cencora Inc                             :    0.482 (Filing Date: 2025-11-25)
+Campbell's Co                           :    0.354 (Filing Date: 2025-09-18)
+Tootsie Roll Industries Inc. (Sweets Co. of America):    0.316 (Filing Date: 2025-02-28)
+
+--- Bottom 10 Firms (by most recent TLS Score) ---
+Kellanova (Formerly Kellogg Co.)        :   -7.865 (Filing Date: 2025-03-07)
+Church & Dwight Co., Inc.               :   -6.246 (Filing Date: 2025-02-13)
+Bellring Brands Inc                     :   -5.941 (Filing Date: 2025-11-18)
+Vital Farms, Inc.                       :   -4.941 (Filing Date: 2025-02-27)
+Kenvue Inc                              :   -4.597 (Filing Date: 2025-02-24)
+W D-40 Co                               :   -4.595 (Filing Date: 2025-10-27)
+Interparfums Inc                        :   -4.524 (Filing Date: 2025-03-11)
+Mondelez International Inc. (Kraft Foods):   -3.434 (Filing Date: 2025-02-05)
+Clorox Co.                              :   -3.193 (Filing Date: 2025-08-08)
+Walmart Inc                             :   -3.117 (Filing Date: 2025-03-14)
+
+================================================================================
+SECTOR: ENERGY
+================================================================================
+
+--- Top 10 Firms (by most recent TLS Score) ---
+Sunrun Inc                              :  103.345 (Filing Date: 2025-02-27)
+XPLR Infrastr LP                        :   56.725 (Filing Date: 2025-02-21)
+Array Technologies, Inc.                :   46.894 (Filing Date: 2025-03-03)
+Eos Energy Enterprises Inc.             :   43.237 (Filing Date: 2025-03-04)
+Valero Energy Corp.                     :   38.624 (Filing Date: 2025-02-26)
+Calumet Specialty Products Partners LP  :   33.057 (Filing Date: 2025-03-03)
+Vistra Energy Corp                      :   26.062 (Filing Date: 2025-02-28)
+Alto Ingredients Inc                    :   24.941 (Filing Date: 2025-03-13)
+CVR Energy Inc                          :   23.985 (Filing Date: 2025-02-19)
+NextDecade Corp                         :   23.727 (Filing Date: 2025-02-28)
+
+--- Bottom 10 Firms (by most recent TLS Score) ---
+Kodiak Gas Services Inc                 :   -8.757 (Filing Date: 2025-03-17)
+DNOW Inc                                :   -8.525 (Filing Date: 2025-02-18)
+Oceaneering International Inc.          :   -4.748 (Filing Date: 2025-03-04)
+RPC Inc                                 :   -3.920 (Filing Date: 2025-02-28)
+Delek Logistics Partners L.P.           :   -3.180 (Filing Date: 2025-02-26)
+Williams Cos. (The)                     :   -2.209 (Filing Date: 2025-02-25)
+Patterson-UTI Energy Inc                :   -1.943 (Filing Date: 2025-02-11)
+Helmerich & Payne, Inc.                 :   -1.912 (Filing Date: 2025-11-21)
+Devon Energy Corp. (New)                :   -1.692 (Filing Date: 2025-02-19)
+Antero Midstream Corp                   :   -1.551 (Filing Date: 2025-02-12)
+
+================================================================================
+SECTOR: FINANCE
+================================================================================
+
+--- Top 10 Firms (by most recent TLS Score) ---
+QuantumScape                            :   69.537 (Filing Date: 2025-02-26)
+Microvast Holdings Inc                  :   62.399 (Filing Date: 2025-03-31)
+Enovix Corp                             :   52.953 (Filing Date: 2025-02-25)
+Nuscale Power Corp                      :   45.445 (Filing Date: 2025-03-03)
+Nelnet, Inc Class A                     :   20.968 (Filing Date: 2025-02-27)
+MP Materials Corp                       :   11.813 (Filing Date: 2025-02-28)
+LiveWire Group Inc                      :   11.041 (Filing Date: 2025-02-21)
+Federal Agricultural Mortgage Corp Cl C :    9.011 (Filing Date: 2025-02-21)
+Oklo Inc                                :    6.993 (Filing Date: 2025-03-24)
+Globe Life, Inc. (formerly Torchmark Corp. and Liberty National Life Insurance Co.):    6.758 (Filing Date: 2025-02-26)
+
+--- Bottom 10 Firms (by most recent TLS Score) ---
+Atlanticus Holdings Corp                :  -31.499 (Filing Date: 2025-03-31)
+MSCI Inc                                :  -19.380 (Filing Date: 2025-02-07)
+Blue Owl Cap Class A                    :   -9.011 (Filing Date: 2025-02-21)
+BGC Group Inc                           :   -7.289 (Filing Date: 2025-04-30)
+Interactive Brokers Group Inc           :   -7.220 (Filing Date: 2025-03-05)
+TPG Inc                                 :   -5.678 (Filing Date: 2025-02-18)
+Hamilton Lane Inc                       :   -5.304 (Filing Date: 2025-05-30)
+Invesco Ltd. ADR                        :   -5.055 (Filing Date: 2025-02-25)
+WisdomTree Investments Inc              :   -4.824 (Filing Date: 2025-02-26)
+SEI Investments Co.                     :   -4.657 (Filing Date: 2025-02-20)
+
+================================================================================
+SECTOR: HEALTH CARE
+================================================================================
+
+--- Top 10 Firms (by most recent TLS Score) ---
+Riot Platforms Inc                      :   17.814 (Filing Date: 2025-02-28)
+Protagonist Therapeutics Inc            :    9.807 (Filing Date: 2025-02-21)
+Corcept Therapeutics Inc                :    4.099 (Filing Date: 2025-02-26)
+Agios Pharmaceuticals Inc               :    3.954 (Filing Date: 2025-02-13)
+Neurocrine Biosciences Inc.             :    2.655 (Filing Date: 2025-02-10)
+Cytokinetics Inc                        :    2.447 (Filing Date: 2025-02-27)
+United Therapeutics Corp                :    2.306 (Filing Date: 2025-02-26)
+Biogen Inc                              :    2.294 (Filing Date: 2025-02-12)
+Alnylam Pharmaceuticals Inc             :    2.277 (Filing Date: 2025-02-13)
+Opko Health Inc                         :    2.236 (Filing Date: 2025-03-21)
+
+--- Bottom 10 Firms (by most recent TLS Score) ---
+PROCEPT BioRobotics Corp                :  -12.788 (Filing Date: 2025-04-11)
+Chemed Corporation                      :   -7.918 (Filing Date: 2025-04-01)
+Beigene Ltd                             :   -6.527 (Filing Date: 2025-02-28)
+Merit Medical Systems Inc.              :   -5.294 (Filing Date: 2025-04-14)
+Repligen Corp.                          :   -5.042 (Filing Date: 2025-03-14)
+Psychemedics Corp                       :   -4.284 (Filing Date: 2025-03-24)
+Innoviva Inc                            :   -3.704 (Filing Date: 2025-03-24)
+STERIS Corp.                            :   -3.485 (Filing Date: 2025-05-29)
+Cooper Companies Inc                    :   -3.103 (Filing Date: 2025-12-05)
+GE HealthCare Technologies Inc          :   -2.973 (Filing Date: 2025-02-13)
+
+================================================================================
+SECTOR: INDUSTRIALS
+================================================================================
+
+--- Top 10 Firms (by most recent TLS Score) ---
+Nextpower Inc                           :   66.577 (Filing Date: 2025-05-22)
+Amprius Technologies Inc                :   63.608 (Filing Date: 2025-03-20)
+American Superconductor Corp.           :   50.069 (Filing Date: 2025-05-21)
+Ameresco Inc                            :   47.016 (Filing Date: 2025-02-28)
+Bloom Energy Corp                       :   46.145 (Filing Date: 2025-02-27)
+Argan Inc.                              :   27.170 (Filing Date: 2025-03-27)
+Generac Holdlings Inc                   :   20.903 (Filing Date: 2025-02-19)
+EnerSys Inc.                            :   20.404 (Filing Date: 2025-05-21)
+Waste Management, Inc. (Old)            :   19.991 (Filing Date: 2025-02-19)
+Quanta Services, Inc.                   :   19.781 (Filing Date: 2025-02-20)
+
+--- Bottom 10 Firms (by most recent TLS Score) ---
+Terex Corp. (Northwest Engineering Co.) :  -13.686 (Filing Date: 2025-02-07)
+Standex International Corp.             :   -8.772 (Filing Date: 2025-08-04)
+Otis Worldwide Corp                     :   -8.751 (Filing Date: 2025-02-04)
+Team Inc                                :   -7.866 (Filing Date: 2025-03-19)
+GEO Group, Inc. (The)                   :   -5.134 (Filing Date: 2025-02-28)
+Acuity Brands Inc                       :   -3.965 (Filing Date: 2025-10-27)
+GXO Logistics Inc                       :   -3.875 (Filing Date: 2025-02-18)
+Willis Lease Finance Corp.              :   -3.344 (Filing Date: 2025-03-11)
+Graco Inc.                              :   -3.136 (Filing Date: 2025-02-18)
+Trinity Industries Inc                  :   -2.801 (Filing Date: 2025-02-20)
+
+================================================================================
+SECTOR: INFORMATION TECHNOLOGY
+================================================================================
+
+--- Top 10 Firms (by most recent TLS Score) ---
+First Solar Inc                         :  119.427 (Filing Date: 2025-02-25)
+SolarEdge Technologies Inc              :   82.910 (Filing Date: 2025-02-25)
+Enphase Energy Inc                      :   48.346 (Filing Date: 2025-02-10)
+MasTec Inc. (Burnup & Sims, Inc.)       :   13.986 (Filing Date: 2025-02-28)
+Equinix Inc                             :    7.813 (Filing Date: 2025-02-12)
+Celestica Inc                           :    7.490 (Filing Date: 2025-03-03)
+Littelfuse Inc.                         :    6.092 (Filing Date: 2025-03-13)
+Applied Digital Corp                    :    4.594 (Filing Date: 2025-07-30)
+CommScope Holding Co Inc                :    4.155 (Filing Date: 2025-02-26)
+Alarm.com Holdings Inc                  :    3.378 (Filing Date: 2025-02-20)
+
+--- Bottom 10 Firms (by most recent TLS Score) ---
+Workiva Inc                             :   -8.688 (Filing Date: 2025-02-25)
+Navitas Semiconductor Corp              :   -6.862 (Filing Date: 2025-05-01)
+ServiceNow Inc                          :   -5.506 (Filing Date: 2025-01-30)
+TeraData Corp. (New)                    :   -5.501 (Filing Date: 2025-02-21)
+Netscout Systems Inc.                   :   -5.265 (Filing Date: 2025-05-15)
+DXC Technology Co. (Computer Sciences Corp.):   -4.659 (Filing Date: 2025-05-15)
+Dell Technologies Inc                   :   -4.150 (Filing Date: 2025-03-25)
+Veeva Systems Inc                       :   -4.081 (Filing Date: 2025-03-24)
+Bel Fuse Inc Class A                    :   -4.020 (Filing Date: 2025-02-28)
+HP Inc                                  :   -3.662 (Filing Date: 2024-12-13)
+
+================================================================================
+SECTOR: MATERIALS
+================================================================================
+
+--- Top 10 Firms (by most recent TLS Score) ---
+Albemarle Corp.                         :   11.348 (Filing Date: 2025-02-12)
+Ivanhoe Electric Inc                    :    9.947 (Filing Date: 2025-02-28)
+Century Aluminum Co.                    :    9.891 (Filing Date: 2025-03-03)
+CF Industries Holdings Inc              :    8.412 (Filing Date: 2025-02-20)
+TMC the metals company Inc              :    5.568 (Filing Date: 2025-03-27)
+Cliffs Natural Resources Inc.           :    5.241 (Filing Date: 2025-02-25)
+Air Products & Chemicals Inc            :    5.216 (Filing Date: 2025-11-20)
+Alcoa Corp                              :    5.044 (Filing Date: 2025-02-20)
+Cabot Corp.                             :    4.732 (Filing Date: 2025-11-24)
+Nucor Corp. (Nuclear Corp. of America)  :    4.135 (Filing Date: 2025-02-27)
+
+--- Bottom 10 Firms (by most recent TLS Score) ---
+Element Solutions Inc                   :   -5.181 (Filing Date: 2025-02-19)
+O-I Glass Inc                           :   -3.752 (Filing Date: 2025-02-12)
+Scotts Miracle-Gro Co. (The)            :   -3.459 (Filing Date: 2025-11-25)
+Louisiana Pacific Corp.                 :   -3.262 (Filing Date: 2025-02-19)
+Amcor Ltd                               :   -3.184 (Filing Date: 2025-08-15)
+Sensient Technologies, Inc.             :   -3.028 (Filing Date: 2025-02-19)
+Sonoco Products Co.                     :   -2.978 (Filing Date: 2025-02-28)
+Atlas Energy Solutions Inc              :   -2.819 (Filing Date: 2025-02-25)
+UFP Technologies Inc. (United Foam Plastics Corp.):   -2.765 (Filing Date: 2025-03-03)
+Quaker Chemical Corp.                   :   -2.632 (Filing Date: 2025-02-24)
+
+================================================================================
+SECTOR: REAL ESTATE
+================================================================================
+
+--- Top 10 Firms (by most recent TLS Score) ---
+Essex Property Trust, Inc.              :  285.888 (Filing Date: 2025-02-21)
+Hannon Armstrong Sustainable Infrastr Ca:   36.701 (Filing Date: 2025-03-28)
+Extra Space Storage, Inc.               :    6.969 (Filing Date: 2025-02-28)
+Rayonier Inc. (New)                     :    5.402 (Filing Date: 2025-02-21)
+ProLogis, Inc.                          :    3.733 (Filing Date: 2025-02-14)
+Digital Realty Trust, Inc.              :    3.410 (Filing Date: 2025-02-25)
+Alexandria Real Estate Equities, Inc.   :    1.887 (Filing Date: 2025-01-27)
+Public Storage, Inc.                    :    0.922 (Filing Date: 2025-02-24)
+National Storage Affiliates Trust       :    0.829 (Filing Date: 2025-02-27)
+Sun Communities, Inc.                   :    0.589 (Filing Date: 2025-02-28)
+
+--- Bottom 10 Firms (by most recent TLS Score) ---
+Centerspace                             :  -89.791 (Filing Date: 2025-02-18)
+MFA Financial, Inc.                     :   -8.401 (Filing Date: 2025-02-20)
+Newmark Group Inc                       :   -8.281 (Filing Date: 2025-04-30)
+Jones Lang Lasalle Inc                  :   -6.746 (Filing Date: 2025-02-19)
+Uniti Group Inc                         :   -5.562 (Filing Date: 2025-03-24)
+Veris Residential                       :   -3.772 (Filing Date: 2025-02-24)
+CareTrust REIT Inc                      :   -3.622 (Filing Date: 2025-02-12)
+LXP Industrial Trust                    :   -3.418 (Filing Date: 2025-02-13)
+CoreCivic Inc. (Corrections Corp. of America):   -3.370 (Filing Date: 2025-02-21)
+Elme Communities                        :   -3.345 (Filing Date: 2025-02-14)
+
+================================================================================
+SECTOR: TRANSPORTS
+================================================================================
+
+--- Top 10 Firms (by most recent TLS Score) ---
+Delta Air Lines Inc. (New)              :    9.874 (Filing Date: 2025-02-11)
+United Airlines Holdings Inc            :    8.790 (Filing Date: 2025-02-27)
+JetBlue Airways Corp                    :    7.595 (Filing Date: 2025-02-14)
+Saia Inc                                :    7.436 (Filing Date: 2025-02-24)
+Alaska Air Group Inc                    :    5.688 (Filing Date: 2025-02-14)
+FedEx Corporation                       :    5.186 (Filing Date: 2025-07-21)
+American Airlines Group Inc             :    3.266 (Filing Date: 2025-02-19)
+Southwest Airlines Co.                  :    2.587 (Filing Date: 2025-02-07)
+ArcBest Corp                            :    1.264 (Filing Date: 2025-03-03)
+Landstar System Inc                     :    0.912 (Filing Date: 2025-02-24)
+
+--- Bottom 10 Firms (by most recent TLS Score) ---
+Herc Holdings Inc                       :   -2.357 (Filing Date: 2025-02-13)
+C.H. Robinson Worldwide Inc             :   -2.229 (Filing Date: 2025-02-14)
+Canadian Pacific Kansas City Limited    :   -2.108 (Filing Date: 2025-04-28)
+Werner Enterprises, Inc.                :   -2.070 (Filing Date: 2025-02-26)
+Norfolk Southern Corp.                  :   -2.043 (Filing Date: 2025-02-10)
+Kirby Corp                              :   -1.874 (Filing Date: 2025-02-18)
+Schneider National Inc                  :   -0.976 (Filing Date: 2025-02-21)
+Old Dominion Freight Line Inc           :   -0.853 (Filing Date: 2025-02-25)
+RXO Inc                                 :   -0.716 (Filing Date: 2025-02-27)
+Hunt (J.B.) Transport Services, Inc.    :   -0.689 (Filing Date: 2024-02-23)
+
+================================================================================
+SECTOR: UTILITIES & TELECOMMUNICATIONS
+================================================================================
+
+--- Top 10 Firms (by most recent TLS Score) ---
+AES Corp. (The)                         :   65.966 (Filing Date: 2025-03-11)
+Fluence Energy Inc                      :   63.909 (Filing Date: 2025-11-25)
+ALLETE Inc. (Minnesota Power and Light - Duluth Edison Electric):   59.759 (Filing Date: 2025-02-13)
+MGE Energy Inc. (Madison Gas & Electric):   59.590 (Filing Date: 2025-02-25)
+Ormat Technologies Inc                  :   58.081 (Filing Date: 2025-02-27)
+Portland General Electric Co. (New)     :   54.990 (Filing Date: 2025-02-14)
+WEC Energy Group (Wisconsin Electric Power):   51.147 (Filing Date: 2025-02-21)
+Alliant Energy Corp                     :   50.985 (Filing Date: 2025-02-21)
+Hawaiian Electric Industries            :   44.734 (Filing Date: 2025-02-24)
+CMS Energy Corp. (Consumers Power Co.)  :   40.541 (Filing Date: 2025-02-11)
+
+--- Bottom 10 Firms (by most recent TLS Score) ---
+Core & Main Inc.                        :   -2.347 (Filing Date: 2025-03-25)
+Crown Castle Inc                        :   -2.269 (Filing Date: 2025-03-14)
+H2O America                             :   -2.154 (Filing Date: 2025-02-28)
+Ringcentral Inc                         :   -1.991 (Filing Date: 2025-04-30)
+Gogo Inc                                :   -1.611 (Filing Date: 2025-03-14)
+Glblstar Inc                            :   -1.235 (Filing Date: 2025-02-28)
+Array Digital Infrastr Inc              :   -1.205 (Filing Date: 2025-04-09)
+Telephone and Data Systems Inc          :   -1.078 (Filing Date: 2025-02-21)
+Spire Inc. (Laclede Gas Light)          :   -0.675 (Filing Date: 2025-11-14)
+AT&T Inc. (Southwestern Bell - SBC Corp.):   -0.323 (Filing Date: 2025-02-12)
+
+================================================================================

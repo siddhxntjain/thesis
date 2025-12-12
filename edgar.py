@@ -3,8 +3,9 @@
 EDGAR 10-K NLP scorer
 - Downloads recent 10-Ks for given tickers from SEC EDGAR
 - Scores filings for substantive energy-transition language vs boilerplate ESG language
-- Computes 18 weighting variations (6 methodologies × 3 metrics) + z-scores
+- Computes 18 weighting variations (6 methodologies × 3 metrics)
 - Normalizes all counts per 10k words for comparability
+- Z-scores are computed in edgar_cleaning.py after data cleaning
 """
 
 import argparse, json, os, re, time, unicodedata
@@ -44,10 +45,6 @@ NUMERIC_CONTEXT = re.compile(
 )
 
 # --------------------------- HELPERS ----------------------------------
-
-def zscore(x: pd.Series) -> pd.Series:
-    """Standardize a vector to mean 0, std 1 (adds small epsilon to avoid divide-by-zero)."""
-    return (x - x.mean()) / (x.std(ddof=0) + 1e-12)
 
 def http_get(url, params=None, binary=False, sleep=0.8):
     """
@@ -354,31 +351,7 @@ def run(tickers: List[str], max_filings: int,
     if len(out) == 0:
         return out
 
-    # 8) Compute z-scores for ALL metrics
-    # This allows post-hoc analysis of which methodology works best
-
-    # Base metrics z-scores
-    out["substantive_base_z"] = zscore(out["substantive_base"])
-    out["boilerplate_base_z"] = zscore(out["boilerplate_base"])
-    out["tls_base_z"] = zscore(out["tls_base"])
-
-    # Section-weighted z-scores
-    out["substantive_section_z"] = zscore(out["substantive_section"])
-    out["boilerplate_section_z"] = zscore(out["boilerplate_section"])
-    out["tls_section_z"] = zscore(out["tls_section"])
-
-    # Proximity-weighted z-scores (1.5x and 2x)
-    for suffix in ["prox15", "prox20"]:
-        out[f"substantive_{suffix}_z"] = zscore(out[f"substantive_{suffix}"])
-        out[f"boilerplate_{suffix}_z"] = zscore(out[f"boilerplate_{suffix}"])
-        out[f"tls_{suffix}_z"] = zscore(out[f"tls_{suffix}"])
-
-    # Full weighting z-scores (section + proximity at 1.5x and 2x)
-    for suffix in ["full15", "full20"]:
-        out[f"substantive_{suffix}_z"] = zscore(out[f"substantive_{suffix}"])
-        out[f"boilerplate_{suffix}_z"] = zscore(out[f"boilerplate_{suffix}"])
-        out[f"tls_{suffix}_z"] = zscore(out[f"tls_{suffix}"])
-
+    # Note: z-scores are now computed in edgar_cleaning.py after data cleaning
     return out
 
 # --------------------------- CLI ENTRYPOINT ----------------------------
@@ -416,25 +389,19 @@ if __name__ == "__main__":
               substantive_file=args.substantive_file,
               boilerplate_file=args.boilerplate_file)
 
-    # Final save with recomputed z-scores
+    # Final save (z-scores will be computed in edgar_cleaning.py)
     if len(res) > 0:
         cols = [
             "ticker","cik","filing_date","accession","doc","tokens",
             "substantive_base","boilerplate_base","tls_base",
-            "substantive_base_z","boilerplate_base_z","tls_base_z",
             "substantive_section","boilerplate_section","tls_section",
-            "substantive_section_z","boilerplate_section_z","tls_section_z",
             "substantive_prox15","boilerplate_prox15","tls_prox15",
-            "substantive_prox15_z","boilerplate_prox15_z","tls_prox15_z",
             "substantive_prox20","boilerplate_prox20","tls_prox20",
-            "substantive_prox20_z","boilerplate_prox20_z","tls_prox20_z",
             "substantive_full15","boilerplate_full15","tls_full15",
-            "substantive_full15_z","boilerplate_full15_z","tls_full15_z",
             "substantive_full20","boilerplate_full20","tls_full20",
-            "substantive_full20_z","boilerplate_full20_z","tls_full20_z",
         ]
         Path(args.out).write_text(res[cols].to_csv(index=False), encoding="utf-8")
         print(f"\n[COMPLETE] {args.out}: {len(res)} rows, {len(cols)} columns")
-        print(f"6 methodologies × 3 metrics × 2 = 36 variations (raw + z-scores)")
+        print(f"6 methodologies × 3 metrics = 18 raw scores (z-scores added in edgar_cleaning.py)")
     else:
         print("No results.")

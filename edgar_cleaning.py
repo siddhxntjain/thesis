@@ -9,6 +9,10 @@ Creates cleaned_edgar.csv while preserving raw data in tls_scores_all.csv.
 import pandas as pd
 import sys
 
+def zscore(x: pd.Series) -> pd.Series:
+    """Standardize a vector to mean 0, std 1 (adds small epsilon to avoid divide-by-zero)."""
+    return (x - x.mean()) / (x.std(ddof=0) + 1e-12)
+
 def normalize_ticker(ticker):
     """
     Normalize ticker format for matching.
@@ -59,6 +63,27 @@ def main():
     # Drop the temporary normalized ticker column
     merged_df.drop(columns=['ticker_normalized'], inplace=True)
 
+    # Drop all z-score columns (will be recalculated after cleaning)
+    print("\nDropping z-score columns...")
+    z_score_cols = [col for col in merged_df.columns if col.endswith('_z')]
+    if z_score_cols:
+        merged_df.drop(columns=z_score_cols, inplace=True)
+        print(f"  ✓ Dropped {len(z_score_cols)} z-score columns")
+
+    # Drop rows where all base scores are 0 (erroneous data)
+    print("\nRemoving erroneous rows (all base scores = 0)...")
+    initial_count = len(merged_df)
+    merged_df = merged_df[
+        ~((merged_df['substantive_base'] == 0) &
+          (merged_df['boilerplate_base'] == 0) &
+          (merged_df['tls_base'] == 0))
+    ]
+    dropped_count = initial_count - len(merged_df)
+    if dropped_count > 0:
+        print(f"  ✓ Dropped {dropped_count} rows with all-zero base scores")
+    else:
+        print(f"  ✓ No erroneous rows found")
+
     # Report merge statistics
     matched = merged_df['market_cap'].notna().sum()
     unmatched = merged_df['market_cap'].isna().sum()
@@ -73,6 +98,33 @@ def main():
         print(f"    {', '.join(sorted(unmatched_tickers)[:20])}")
         if len(unmatched_tickers) > 20:
             print(f"    ... and {len(unmatched_tickers) - 20} more")
+
+    # Compute z-scores for all metrics (after cleaning)
+    print("\nComputing z-scores for all metrics...")
+
+    # Base metrics z-scores
+    merged_df["substantive_base_z"] = zscore(merged_df["substantive_base"])
+    merged_df["boilerplate_base_z"] = zscore(merged_df["boilerplate_base"])
+    merged_df["tls_base_z"] = zscore(merged_df["tls_base"])
+
+    # Section-weighted z-scores
+    merged_df["substantive_section_z"] = zscore(merged_df["substantive_section"])
+    merged_df["boilerplate_section_z"] = zscore(merged_df["boilerplate_section"])
+    merged_df["tls_section_z"] = zscore(merged_df["tls_section"])
+
+    # Proximity-weighted z-scores (1.5x and 2x)
+    for suffix in ["prox15", "prox20"]:
+        merged_df[f"substantive_{suffix}_z"] = zscore(merged_df[f"substantive_{suffix}"])
+        merged_df[f"boilerplate_{suffix}_z"] = zscore(merged_df[f"boilerplate_{suffix}"])
+        merged_df[f"tls_{suffix}_z"] = zscore(merged_df[f"tls_{suffix}"])
+
+    # Full weighting z-scores (section + proximity at 1.5x and 2x)
+    for suffix in ["full15", "full20"]:
+        merged_df[f"substantive_{suffix}_z"] = zscore(merged_df[f"substantive_{suffix}"])
+        merged_df[f"boilerplate_{suffix}_z"] = zscore(merged_df[f"boilerplate_{suffix}"])
+        merged_df[f"tls_{suffix}_z"] = zscore(merged_df[f"tls_{suffix}"])
+
+    print(f"  ✓ Added 18 z-score columns")
 
     # Save cleaned data
     print("\nSaving cleaned data to cleaned_edgar.csv...")
