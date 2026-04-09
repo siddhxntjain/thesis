@@ -1,0 +1,37 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#ffffff",
+    "primaryTextColor": "#111111",
+    "lineColor": "#8a8a8a",
+    "clusterBkg": "#ffffff",
+    "clusterBorder": "#d0d0d0",
+    "fontFamily": "Times New Roman, Times, serif",
+    "fontSize": "24px"
+  },
+  "flowchart": {
+    "htmlLabels": true,
+    "curve": "basis",
+    "rankSpacing": 34,
+    "nodeSpacing": 28,
+    "padding": 10
+  }
+}}%%
+
+flowchart LR
+  classDef raw fill:#f6dcc7,stroke:#8a6b4f,color:#111,stroke-width:1px;
+  classDef prep fill:#d9e6f2,stroke:#5a7a96,color:#111,stroke-width:1px;
+  classDef ctrl fill:#dff0dc,stroke:#5e8a66,color:#111,stroke-width:1px;
+  classDef out fill:#f4d9d9,stroke:#9c6c6c,color:#111,stroke-width:1px;
+
+  beta["Trailing 12-Month Returns<br/>Used to Estimate Beta"] --> anchor["Signal Date<br/>End of Fiscal Year t"]
+  filing["Year t 10-K Filing"] --> anchor
+  anchor --> measure["Text Signals and Controls<br/>Measured at t"]
+  anchor --> fwd["Forward Return Windows<br/>3m, 6m, 1y, 2y"]
+  measure --> model["Cross-Sectional Tests"]
+  fwd --> model
+
+  class filing raw;
+  class anchor,measure prep;
+  class beta ctrl;
+  class fwd,model out;

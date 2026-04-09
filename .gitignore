@@ -1,2 +1,50 @@
-returns/
-esg_scores/
+# Local environments and app state
+.venv/
+.claude/
+.pptx_build/
+
+# OS / Python noise
+**/.DS_Store
+**/__pycache__/
+**/*.pyc
+*.log
+
+# Local LaTeX auxiliaries outside the thesis draft source
+*.aux
+*.out
+*.fdb_latexmk
+*.fls
+*.toc
+*.synctex.gz
+
+# Thesis writing materials and local deliverables
+/Thesis Draft/
+/deliverables/
+/thesis.pdf
+
+# Sensitive or licensed data
+/data/raw/**
+/data/cache/**
+/data/processed/**
+/data/curated/**
+/data/outputs/**
+/data/tmp_r1000_chunks/**
+
+# Legacy local-only raw/cache roots
+/cached_edgar/
+/edgar_cache/
+/esg_scores/
+/factor_models/outputs/
+/visualizations/
+/cleaned_edgar.csv
+/ticker_addtl_data.csv
+/tickers.txt
+/test.csv
+/tls_scores_*.csv
+
+# Archive contains local-only history and stale snapshots
+/archive/**
+
+# Keep documentation placeholders if added later
+!/data/**/README.md
+!/data/**/schema.md

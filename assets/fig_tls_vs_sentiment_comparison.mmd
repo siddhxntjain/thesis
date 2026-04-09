@@ -1,0 +1,39 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#ffffff",
+    "primaryTextColor": "#111111",
+    "lineColor": "#8a8a8a",
+    "clusterBkg": "#ffffff",
+    "clusterBorder": "#d0d0d0",
+    "fontFamily": "Times New Roman, Times, serif",
+    "fontSize": "24px"
+  },
+  "flowchart": {
+    "htmlLabels": true,
+    "curve": "basis",
+    "rankSpacing": 34,
+    "nodeSpacing": 28,
+    "padding": 10
+  }
+}}%%
+
+flowchart LR
+  classDef source fill:#f6dcc7,stroke:#8a6b4f,color:#111,stroke-width:1px;
+  classDef tls fill:#dff0dc,stroke:#5e8a66,color:#111,stroke-width:1px;
+  classDef sent fill:#d9e6f2,stroke:#5a7a96,color:#111,stroke-width:1px;
+
+  filing["10-K Filing"]
+
+  filing --> whole["Whole-Filing Text"]
+  filing --> item1["Item 1 Business Text"]
+
+  whole --> counts["Transition and Boilerplate Counts<br/>with Section and Numeric Weighting"]
+  counts --> tls["Transition Language Score"]
+
+  item1 --> score["Sentence Extraction, Filtering,<br/>& Sentiment Scoring"]
+  score --> sent["Transition Sentiment"]
+
+  class filing source;
+  class whole,counts,tls tls;
+  class item1,score,sent sent;
