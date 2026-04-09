@@ -1,3 +1,5 @@
+AI Acknowledgement: This codebase was developed with significant assistance from AI coding agents, primarily Claude and Codex, which were used to support programming, debugging, refactoring, data-pipeline development, and figure/table generation.
+
 # Thesis Pipeline
 
 This repository contains the active code used to reproduce the final within-year thesis pipeline for text-based energy-transition signals in U.S. equities. The supported surface is intentionally small: runnable entrypoints live in `scripts/`, shared logic lives in `src/thesis_pipeline/`, and the data tree is organized by lifecycle stage. The pipeline is designed so another researcher can identify the correct scripts, inputs, and outputs without needing to reverse-engineer historical experiments. `Thesis Draft/` is read-only thesis source material and is not a write target for the active pipeline. `archive/` is local-only historical material and is not part of the publishable repo surface.
@@ -124,6 +126,7 @@ Equivalent stage order:
 ## Data Layout
 
 ### `data/raw/`
+
 Repo-local external inputs.
 
 - `data/raw/assets/asset_data.csv`
@@ -144,6 +147,7 @@ Repo-local external inputs.
   - third-party ESG score inputs
 
 ### `data/cache/`
+
 SEC EDGAR cache.
 
 - `data/cache/edgar_api/`
@@ -154,6 +158,7 @@ SEC EDGAR cache.
   - parsed filing text cache
 
 ### `data/processed/`
+
 Search-stage and intermediate outputs that can be regenerated.
 
 - `data/processed/feature_cache/r1000/`
@@ -178,6 +183,7 @@ Search-stage and intermediate outputs that can be regenerated.
   - universe-selection support material
 
 ### `data/curated/`
+
 Final curated thesis panels used by the analysis scripts.
 
 - `data/curated/r1000/final_within_year/`
@@ -186,6 +192,7 @@ Final curated thesis panels used by the analysis scripts.
   - canonical Transition-100 panel built under the shared TLS lock
 
 ### `data/outputs/`
+
 Frozen final outputs used by the analysis scripts and thesis export layer.
 
 - `data/outputs/final/within_year/`
